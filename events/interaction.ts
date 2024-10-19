@@ -8,6 +8,8 @@ export default createEvent({
   async handler(client, interaction) {
     if (interaction.isChatInputCommand()) {
       await client.handleChatInputCommand(interaction);
+    } else if (interaction.isButton()) {
+      await client.handleButtonCommand(interaction);
     }
   },
 });

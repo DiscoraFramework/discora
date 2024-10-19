@@ -1,6 +1,7 @@
 /** @format */
 
 import {
+  ButtonInteraction,
   ChatInputCommandInteraction,
   Client,
   ClientOptions,
@@ -64,8 +65,33 @@ export class DiscoraClient extends Client {
     const command: ISlashCommand = module.default;
 
     if ("data" in command && "execute" in command) {
+      console.log(command.data.name, module);
+
+      command.handlers = command.handlers || {};
+
       this.slashCommandsInJson.push(command.data.toJSON());
+
       this.slashCommands.set(command.data.name, command);
+      // Initialize as an empty object if undefined
+
+      // Set the command into the collection after any modification
+      this.slashCommands.set(command.data.name, command);
+
+      const handlers = Object.keys(module).filter(
+        (key) => key.endsWith("Handler") && typeof module[key] === "function"
+      );
+
+      handlers.forEach((handler) => {
+        console.log(`Registered ${handler} for command: ${command.data.name}`);
+
+        // Assign the handler
+        command.handlers![handler] = module[handler]; // Safely assign handler
+
+        // After modification, update the collection with the new handlers
+        this.slashCommands.set(command.data.name, command); // Store updated command back
+      });
+
+      console.log(this.slashCommands);
     } else {
       console.warn("[Loader]: Warning - 'data' or 'execute' missing");
     }
@@ -194,6 +220,25 @@ export class DiscoraClient extends Client {
     }
 
     await command.execute(interaction);
+  }
+
+  async handleButtonCommand(interaction: ButtonInteraction) {
+    const commandName = interaction.customId.split("-")[0]; // Assuming command name is part of the custom ID
+    const command = this.slashCommands.get(commandName);
+
+    if (!command || !command.handlers) {
+      console.warn(`No command or handlers found for button: ${commandName}`);
+      return;
+    }
+
+    const handlerName = interaction.customId.split("-")[1]; // Extract the handler name
+    const handler = command.handlers["buttonHandler"];
+
+    if (handler && typeof handler === "function") {
+      await handler(interaction); // Call the handler
+    } else {
+      console.warn(`Handler ${handlerName} not found for command: ${commandName}`);
+    }
   }
 
   async start() {

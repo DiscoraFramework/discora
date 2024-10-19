@@ -1,0 +1,49 @@
+# Environment variables
+.env
+
+# Node modules
+node_modules
+
+# TypeScript configuration
+tsconfig.json
+
+# Compiled TypeScript files
+lib
+
+# Command modules (if you don't want to publish them)
+commands
+
+# Event modules (if you don't want to publish them)
+events
+
+# Nodemon configuration
+nodemon.json
+
+# Logs
+logs
+*.log
+
+# Local config files
+*.local
+
+# Test files and folders
+tests
+coverage
+
+# Documentation
+docs
+
+# IDE configuration files
+.vscode
+.idea
+
+# Miscellaneous
+.DS_Store         # macOS
+Thumbs.db         # Windows
+*.tgz             # tarballs
+*.zip             # zip files
+*.tar.gz          # tar.gz files
+npm-debug.log     # npm debug log
+yarn-error.log     # Yarn error log
+package-lock.json  # Lock files can be excluded if not needed
+pnpm-lock.yaml     # Lock files for pnpm can be excluded

@@ -1,13 +1,51 @@
 /** @format */
 
-import { SlashCommandBuilder } from "discord.js";
+import {
+  SlashCommandBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ButtonInteraction,
+} from "discord.js";
+
 import { createSlashCommand } from "../lib";
+import interaction from "../events/interaction";
 
+export const buttonHandler = async (interaction: ButtonInteraction) => {
+  if (interaction.customId === "ping-hello_button") {
+    return await interaction.reply("hello world");
+  }
 
+  if (interaction.customId === "ping-hi_button") {
+    return await interaction.reply("hi");
+  }
+};
 
+export const autocompleteHandler = async (interaction: any) => {};
+
+//etc
 export default createSlashCommand({
   data: new SlashCommandBuilder().setName("ping").setDescription("test command"),
+
   async execute(interaction) {
-    await interaction.reply("ping");
+    const sayHelloButton = new ButtonBuilder()
+      .setCustomId("ping-hello_button")
+      .setLabel("say hello")
+      .setStyle(ButtonStyle.Primary);
+
+    const sayHiButton = new ButtonBuilder()
+      .setCustomId("ping-hi_button")
+      .setLabel("say hi")
+      .setStyle(ButtonStyle.Primary);
+
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      sayHelloButton,
+      sayHiButton
+    );
+
+    await interaction.reply({
+      content: "How do you want me to respond",
+      components: [row],
+    });
   },
 });
