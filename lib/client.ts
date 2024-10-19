@@ -2,25 +2,29 @@
 
 import { Client, ClientOptions, Collection } from "discord.js";
 import { flatLoader, recursiveLoader } from "./loaders";
-import { ISlashCommand } from "./types";
+import { IEvent, ISlashCommand } from "./types";
 
 type TLoaderEnum = "flat" | "recursive";
 
-interface loaderConfig {
+export interface loaderConfig {
   events: TLoaderEnum;
   message: TLoaderEnum;
   slash: TLoaderEnum;
 }
 
-interface CommandDir {
+export interface ClientHandler {
   slash: string;
   message: string;
+  events: string;
 }
 
-interface DiscoraClientOptions extends ClientOptions {
+export interface DiscoraClientOptions extends ClientOptions {
   root: string;
+  token: string;
+  clientId: string;
+  guildId?: string;
   loader?: TLoaderEnum | loaderConfig;
-  commandsFolders?: Partial<CommandDir>;
+  handler?: Partial<ClientHandler>;
 }
 
 export class DiscoraClient extends Client {
@@ -48,18 +52,47 @@ export class DiscoraClient extends Client {
   }
 
   async loadCommands() {
-    const { commandsFolders, root } = this.config;
+    const { handler, root } = this.config;
 
-    if (commandsFolders?.slash) {
+    if (handler?.slash) {
       if (this.isRecursive("slash")) {
-        recursiveLoader(root, commandsFolders.slash, this.loadCommands.bind(this));
+        recursiveLoader(root, handler.slash, this.loadCommands.bind(this));
       } else {
-        flatLoader(root, commandsFolders.slash, this.loadSlashCommands.bind(this));
+        flatLoader(root, handler.slash, this.loadSlashCommands.bind(this));
       }
     }
   }
 
-  private isRecursive(commandType: "slash" | "message"): boolean {
+  private loadEventModule(module: any) {
+    const event = module.default;
+
+    if (!event) {
+      console.log("fialed to find defualt event object from event module");
+      return;
+    }
+
+    if (event.once) {
+      this.once(event.name, event.handler.bind(this));
+    } else {
+      this.on(event.name, event.handler.bind(this));
+    }
+  }
+
+  async loadEvents() {
+    const { handler, root } = this.config;
+
+    if (!handler?.events) {
+      return;
+    }
+
+    if (this.isRecursive("events")) {
+      recursiveLoader(root, handler.events, this.loadEventModule.bind(this));
+    } else {
+      flatLoader(root, handler.events, this.loadEventModule.bind(this));
+    }
+  }
+
+  private isRecursive(commandType: "slash" | "message" | "events"): boolean {
     const loaderConfig = this.config.loader;
 
     if (!loaderConfig) {

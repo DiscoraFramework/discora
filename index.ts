@@ -7,15 +7,16 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const client = new DiscoraClient({
+  token: process.env.TOKEN as string,
+  clientId: "",
+  guildId: "",
   root: process.cwd(),
+  handler: { slash: "/" },
   intents: [GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent],
-  commandsFolders: { slash: "/commands" },
 });
 
 client.loadCommands();
 
-client.on("ready", function (e) {
-  console.log(`bot is ready ${e.user.username}`);
-});
+client.loadEvents();
 
-client.login(process.env.TOKEN);
+client.start();
