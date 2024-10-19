@@ -94,9 +94,9 @@ export class DiscoraClient extends Client {
     console.log("loaded", event);
 
     if (event.once) {
-      //this.once(event.name, event.handler.apply(this, ...args));
+      this.once(event.name, (...args) => event.handler(this, ...args));
     } else {
-     // this.on(event.name,  event.handler.apply(this, ...args));
+      this.on(event.name, (...args) => event.handler(this, ...args));
     }
   }
 

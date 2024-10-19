@@ -1,0 +1,8 @@
+{
+  "watch": ["**/*.ts"],
+  "ext": "ts",
+  "ignore": ["node_modules", "dist"],
+  "exec": "tsx ./index.ts",
+  "restartable": "rs",
+  "verbose": true
+}
