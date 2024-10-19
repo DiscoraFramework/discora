@@ -15,6 +15,8 @@ const client = new DiscoraClient({
   intents: [GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent],
 });
 
+
+
 client.loadCommands();
 
 client.loadEvents();

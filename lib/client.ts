@@ -109,5 +109,14 @@ export class DiscoraClient extends Client {
     return false;
   }
 
-  async start() {}
+  async start() {
+    if (!this.config.token) {
+      console.log("token is required in order to start your bot");
+    }
+
+    await this.loadCommands();
+    await this.loadEvents();
+
+    await this.login(this.config.token);
+  }
 }
