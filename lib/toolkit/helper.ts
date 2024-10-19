@@ -21,7 +21,7 @@ export function createEvent<K extends keyof ClientEvents>(eventInterface: IEvent
   const { name, handler } = eventInterface;
 
   // Validate that the event name is a valid Discord.js event
-  if (!name || !(name in Events)) {
+  if (!name) {
     throw new Error(`Invalid event name: ${name}`);
   }
 

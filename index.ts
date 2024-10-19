@@ -8,17 +8,19 @@ dotenv.config();
 
 const client = new DiscoraClient({
   token: process.env.TOKEN as string,
-  clientId: "",
-  guildId: "",
+  clientId: process.env.CLIENT_ID as string,
+  guildId: process.env.GUILD_ID as string,
   root: process.cwd(),
-  handler: { slash: "/" },
-  intents: [GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent],
+  handler: {
+    slash: "/commands",
+    events: "/events",
+    message: "/message-command",
+  },
+  client: {
+    intents: [GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent],
+  },
 });
 
-
-
-client.loadCommands();
-
-client.loadEvents();
-
 client.start();
+
+

@@ -1,8 +1,16 @@
 /** @format */
 
-import { Client, ClientOptions, Collection } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  Client,
+  ClientOptions,
+  Collection,
+  REST,
+  Routes,
+} from "discord.js";
+
 import { flatLoader, recursiveLoader } from "./loaders";
-import { IEvent, ISlashCommand } from "./types";
+import { ISlashCommand } from "./types";
 
 type TLoaderEnum = "flat" | "recursive";
 
@@ -18,13 +26,26 @@ export interface ClientHandler {
   events: string;
 }
 
-export interface DiscoraClientOptions extends ClientOptions {
+export interface DiscoraClientOptions {
   root: string;
   token: string;
   clientId: string;
+  environment?: "production" | "development";
   guildId?: string;
   loader?: TLoaderEnum | loaderConfig;
   handler?: Partial<ClientHandler>;
+  client: ClientOptions;
+}
+
+function _defaults(options: DiscoraClientOptions) {
+  const _options: DiscoraClientOptions = {
+    ...options,
+    loader: options.loader || "flat",
+    environment: options.environment || "development",
+    root: options.root || process.cwd(),
+  };
+
+  return _options;
 }
 
 export class DiscoraClient extends Client {
@@ -33,17 +54,16 @@ export class DiscoraClient extends Client {
   slashCommandsInJson: any[];
 
   constructor(config: DiscoraClientOptions) {
-    super(config);
-    this.config = config;
+    super(config.client);
+    this.config = _defaults(config);
     this.slashCommands = new Collection();
     this.slashCommandsInJson = [];
   }
 
-  async loadSlashCommands(module: any) {
+  async loadSlashCommandsModule(module: any) {
     const command: ISlashCommand = module.default;
 
     if ("data" in command && "execute" in command) {
-      console.log(command);
       this.slashCommandsInJson.push(command.data.toJSON());
       this.slashCommands.set(command.data.name, command);
     } else {
@@ -58,7 +78,7 @@ export class DiscoraClient extends Client {
       if (this.isRecursive("slash")) {
         recursiveLoader(root, handler.slash, this.loadCommands.bind(this));
       } else {
-        flatLoader(root, handler.slash, this.loadSlashCommands.bind(this));
+        flatLoader(root, handler.slash, this.loadSlashCommandsModule.bind(this));
       }
     }
   }
@@ -71,10 +91,12 @@ export class DiscoraClient extends Client {
       return;
     }
 
+    console.log("loaded", event);
+
     if (event.once) {
-      this.once(event.name, event.handler.bind(this));
+      //this.once(event.name, event.handler.apply(this, ...args));
     } else {
-      this.on(event.name, event.handler.bind(this));
+     // this.on(event.name,  event.handler.apply(this, ...args));
     }
   }
 
@@ -108,6 +130,71 @@ export class DiscoraClient extends Client {
     }
     return false;
   }
+  private async registerGuildCommands() {
+    try {
+      const clientId = this.config.clientId;
+      const guildId = this.config.guildId as string;
+
+      const rest = new REST().setToken(this.config.token);
+
+      const data: any = await rest.put(
+        Routes.applicationGuildCommands(clientId, guildId),
+        {
+          body: this.slashCommandsInJson,
+        }
+      );
+
+      console.log(`Successfully reloaded ${data?.length} application (/) commands.`);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  private async registerGlobalCommands() {
+    try {
+      const clientId = this.config.clientId;
+
+      const rest = new REST().setToken(this.config.token);
+
+      const data: any = await rest.put(Routes.applicationCommands(clientId), {
+        body: this.slashCommandsInJson,
+      });
+
+      console.log(`Successfully reloaded ${data?.length} application (/) commands.`);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async registerCommand() {
+    const { environment, clientId, guildId } = this.config;
+
+    if (!clientId) {
+      throw new Error("ClientId is required to register commands.");
+    }
+
+    if (environment === "development") {
+      if (!guildId) {
+        throw new Error("GuildId is required to register guild commands in development.");
+      }
+      return await this.registerGuildCommands();
+    }
+
+    // If in production, register global commands
+    await this.registerGlobalCommands();
+  }
+
+  // command handlers
+
+  async handleChatInputCommand(interaction: ChatInputCommandInteraction) {
+    const commandName = interaction.commandName;
+    const command = this.slashCommands.get(commandName);
+
+    if (!command) {
+      return;
+    }
+
+    await command.execute(interaction);
+  }
 
   async start() {
     if (!this.config.token) {
@@ -116,6 +203,8 @@ export class DiscoraClient extends Client {
 
     await this.loadCommands();
     await this.loadEvents();
+
+    await this.registerCommand();
 
     await this.login(this.config.token);
   }

@@ -6,9 +6,7 @@ import { createSlashCommand } from "../lib";
 
 
 export default createSlashCommand({
-  data: new SlashCommandBuilder()
-  .setName("ping")
-  .setDescription("test command"),
+  data: new SlashCommandBuilder().setName("ping").setDescription("test command"),
   async execute(interaction) {
     await interaction.reply("ping");
   },

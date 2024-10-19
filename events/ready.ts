@@ -5,7 +5,7 @@ import { createEvent } from "../lib";
 
 export default createEvent({
   name: Events.ClientReady,
-  handler(client) {
-    console.log(`bot is ready ${client.user!.username}`);
+  handler(_, client) {
+  console.log(_, client, "bot is align")
   },
 });

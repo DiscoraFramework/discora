@@ -8,10 +8,17 @@ export function flatLoader(root: string, folder: string, callback: (command: any
   try {
     const files = fs.readdirSync(folderPath).filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
 
-    for (const file of files) {
-      const commandPath = path.join(folderPath, file);
-      const command = require(commandPath);
-      callback(command);
+    console.log(files);
+    for (let i = 0; i < files.length; i++) {
+      const commandPath = path.join(folderPath, files[i]);
+      console.log(`Loading module from: ${commandPath}`);
+      const module = require(commandPath);
+      // Ensure callback is only called once
+      if (module) {
+        callback(module);
+      } else {
+        console.warn(`No module found at: ${commandPath}`);
+      }
     }
   } catch (error) {
     console.error(`[flatLoader]: Error loading commands from ${folderPath}`, error);
