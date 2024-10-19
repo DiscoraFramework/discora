@@ -19,7 +19,6 @@ type TLoaderEnum = "flat" | "recursive";
 
 export interface loaderConfig {
   events: TLoaderEnum;
-  message: TLoaderEnum;
   slash: TLoaderEnum;
 }
 
@@ -139,7 +138,7 @@ export class DiscoraClient extends Client {
     }
   }
 
-  private isRecursive(commandType: "slash" | "message" | "events"): boolean {
+  private isRecursive(commandType: "slash" |  "events"): boolean {
     const loaderConfig = this.config.loader;
 
     if (!loaderConfig) {

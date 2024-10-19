@@ -1,6 +1,6 @@
 /** @format */
 
-import { AutocompleteInteraction, SlashCommandBuilder } from "discord.js";
+import { AutocompleteInteraction, ModalSubmitInteraction, SlashCommandBuilder } from "discord.js";
 import { createSlashCommand } from "../lib";
 
 export const autoCompleteHandler = async (interaction: AutocompleteInteraction) => {
@@ -28,6 +28,7 @@ export const autoCompleteHandler = async (interaction: AutocompleteInteraction) 
     }))
   );
 };
+
 
 export default createSlashCommand({
   data: new SlashCommandBuilder()

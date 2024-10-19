@@ -14,7 +14,6 @@ const client = new DiscoraClient({
   handler: {
     slash: "/commands",
     events: "/events",
-    message: "/message-command",
   },
   client: {
     intents: [GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent],

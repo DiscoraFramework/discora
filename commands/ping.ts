@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 
 import { createSlashCommand } from "../lib";
-import interaction from "../events/interaction";
+
 
 export const buttonHandler = async (interaction: ButtonInteraction) => {
   if (interaction.customId === "ping-hello_button") {
@@ -23,9 +23,9 @@ export const buttonHandler = async (interaction: ButtonInteraction) => {
   }
 };
 
-export const autocompleteHandler = async (interaction: AutocompleteInteraction) => {
- 
-};
+
+
+
 
 //etc
 export default createSlashCommand({
