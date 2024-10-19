@@ -1,6 +1,7 @@
 /** @format */
 
 import {
+  AutocompleteInteraction,
   ButtonInteraction,
   ChatInputCommandInteraction,
   Client,
@@ -12,6 +13,7 @@ import {
 
 import { flatLoader, recursiveLoader } from "./loaders";
 import { ISlashCommand } from "./types";
+import { devLog } from "./utils/functions";
 
 type TLoaderEnum = "flat" | "recursive";
 
@@ -65,7 +67,6 @@ export class DiscoraClient extends Client {
     const command: ISlashCommand = module.default;
 
     if ("data" in command && "execute" in command) {
-      console.log(command.data.name, module);
 
       command.handlers = command.handlers || {};
 
@@ -93,7 +94,7 @@ export class DiscoraClient extends Client {
 
       console.log(this.slashCommands);
     } else {
-      console.warn("[Loader]: Warning - 'data' or 'execute' missing");
+      devLog(this, "[Loader]: Warning - 'data' or 'execute' missing");
     }
   }
 
@@ -113,11 +114,9 @@ export class DiscoraClient extends Client {
     const event = module.default;
 
     if (!event) {
-      console.log("fialed to find defualt event object from event module");
+      devLog(this, "[Loader]: Failed to find default event object in the event module.");
       return;
     }
-
-    console.log("loaded", event);
 
     if (event.once) {
       this.once(event.name, (...args) => event.handler(this, ...args));
@@ -170,7 +169,7 @@ export class DiscoraClient extends Client {
         }
       );
 
-      console.log(`Successfully reloaded ${data?.length} application (/) commands.`);
+      devLog(this, `Successfully reloaded ${data?.length} application dev (/) commands.`);
     } catch (error) {
       console.error(error);
     }
@@ -185,7 +184,7 @@ export class DiscoraClient extends Client {
         body: this.slashCommandsInJson,
       });
 
-      console.log(`Successfully reloaded ${data?.length} application (/) commands.`);
+      devLog(this, `Successfully reloaded ${data?.length} application (/) commands.`);
     } catch (error) {
       console.error(error);
     }
@@ -211,7 +210,7 @@ export class DiscoraClient extends Client {
 
   // command handlers
 
-  async handleChatInputCommand(interaction: ChatInputCommandInteraction) {
+  async handleChatInput(interaction: ChatInputCommandInteraction) {
     const commandName = interaction.commandName;
     const command = this.slashCommands.get(commandName);
 
@@ -222,12 +221,12 @@ export class DiscoraClient extends Client {
     await command.execute(interaction);
   }
 
-  async handleButtonCommand(interaction: ButtonInteraction) {
+  async handleButton(interaction: ButtonInteraction) {
     const commandName = interaction.customId.split("-")[0]; // Assuming command name is part of the custom ID
     const command = this.slashCommands.get(commandName);
 
     if (!command || !command.handlers) {
-      console.warn(`No command or handlers found for button: ${commandName}`);
+      devLog(this, `No command or handlers found for button: ${commandName}`);
       return;
     }
 
@@ -237,7 +236,35 @@ export class DiscoraClient extends Client {
     if (handler && typeof handler === "function") {
       await handler(interaction); // Call the handler
     } else {
-      console.warn(`Handler ${handlerName} not found for command: ${commandName}`);
+      devLog(this, `Handler ${handlerName} not found for command: ${commandName}`);
+    }
+  }
+
+  async handleAutoComplete(interaction: AutocompleteInteraction) {
+    // Get the command name from the interaction
+    const commandName = interaction.commandName;
+
+    // Retrieve the command from the slashCommands collection
+    const command = this.slashCommands.get(commandName);
+
+    // Check if the command has an autocomplete handler
+    if (!command || !command.handlers?.autoCompleteHandler) {
+      devLog(
+        this,
+        `[AutoComplete]: No autocomplete handler found for command: ${commandName}`
+      );
+      return;
+    }
+
+    try {
+      // Call the autocomplete handler defined in the command file
+      await command.handlers.autoCompleteHandler(interaction);
+    } catch (error) {
+      devLog(
+        this,
+        `[AutoComplete]: Failed to handle autocomplete interaction for ${commandName}`,
+        error
+      );
     }
   }
 

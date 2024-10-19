@@ -4,11 +4,12 @@ import {
   ClientEvents,
   SlashCommandBuilder,
   ChatInputCommandInteraction,
+  SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
 import { DiscoraClient } from "./client";
 
 export interface ISlashCommand {
-  data: SlashCommandBuilder;
+  data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
   execute: (interaction: ChatInputCommandInteraction) => any;
   handlers?: {
     [key: string]: (interaction: any) => any; // Handlers can be of any interaction type

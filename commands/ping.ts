@@ -6,6 +6,8 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ButtonInteraction,
+  ChatInputCommandInteraction,
+  AutocompleteInteraction,
 } from "discord.js";
 
 import { createSlashCommand } from "../lib";
@@ -21,7 +23,9 @@ export const buttonHandler = async (interaction: ButtonInteraction) => {
   }
 };
 
-export const autocompleteHandler = async (interaction: any) => {};
+export const autocompleteHandler = async (interaction: AutocompleteInteraction) => {
+ 
+};
 
 //etc
 export default createSlashCommand({

@@ -7,10 +7,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const client = new DiscoraClient({
+  root: process.cwd(),
   token: process.env.TOKEN as string,
   clientId: process.env.CLIENT_ID as string,
   guildId: process.env.GUILD_ID as string,
-  root: process.cwd(),
   handler: {
     slash: "/commands",
     events: "/events",
@@ -22,5 +22,3 @@ const client = new DiscoraClient({
 });
 
 client.start();
-
-
