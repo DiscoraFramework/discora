@@ -127,7 +127,7 @@ This setup defines a **ready event** for your bot, which logs a message when you
 
 Here's the updated section with the `handleButtonClick` export example for clarity:
 
----
+
 
 ## Handlers
 
