@@ -8,6 +8,7 @@ import {
   ClientOptions,
   Collection,
   ModalSubmitInteraction,
+  Interaction,
   REST,
   Routes,
 } from "discord.js";
@@ -51,10 +52,17 @@ function _defaults(options: DiscoraClientOptions) {
   return _options;
 }
 
-type HandlerKey = "handleButtonClick" | "handleAutoComplete" | "handleModalSubmit";
+type HandlerKey =
+  | "handleButtonClick"
+  | "handleAutoComplete"
+  | "handleModalSubmit";
 
 function isValidHandlerKey(key: string): key is HandlerKey {
-  return ["handleButtonClick", "handleAutoComplete", "handleModalSubmit"].includes(key);
+  return [
+    "handleButtonClick",
+    "handleAutoComplete",
+    "handleModalSubmit",
+  ].includes(key);
 }
 
 export class DiscoraClient extends Client {
@@ -84,7 +92,9 @@ export class DiscoraClient extends Client {
       this.slashCommands.set(command.data.name, command);
 
       const handlers = Object.keys(module).filter(
-        (key) => key.startsWith("handle") && typeof module[key] === "function"
+        (key) =>
+          key.startsWith("handle") &&
+          typeof module[key] === "function"
       );
 
       handlers.forEach((handler) => {
@@ -106,10 +116,18 @@ export class DiscoraClient extends Client {
     if (handler?.slash) {
       if (this.isRecursive("slash")) {
         devLog(this, "Using recursive loader");
-        recursiveLoader(root, handler.slash, this.loadSlashCommandsModule.bind(this));
+        recursiveLoader(
+          root,
+          handler.slash,
+          this.loadSlashCommandsModule.bind(this)
+        );
       } else {
         devLog(this, "Using flat loader");
-        flatLoader(root, handler.slash, this.loadSlashCommandsModule.bind(this));
+        flatLoader(
+          root,
+          handler.slash,
+          this.loadSlashCommandsModule.bind(this)
+        );
       }
     }
   }
@@ -118,12 +136,17 @@ export class DiscoraClient extends Client {
     const event = module.default;
 
     if (!event) {
-      devLog(this, "[Loader]: Failed to find default event object in the event module.");
+      devLog(
+        this,
+        "[Loader]: Failed to find default event object in the event module."
+      );
       return;
     }
 
     if (event.once) {
-      this.once(event.name, (...args) => event.handler(this, ...args));
+      this.once(event.name, (...args) =>
+        event.handler(this, ...args)
+      );
     } else {
       this.on(event.name, (...args) => event.handler(this, ...args));
     }
@@ -137,9 +160,17 @@ export class DiscoraClient extends Client {
     }
 
     if (this.isRecursive("events")) {
-      recursiveLoader(root, handler.events, this.loadEventModule.bind(this));
+      recursiveLoader(
+        root,
+        handler.events,
+        this.loadEventModule.bind(this)
+      );
     } else {
-      flatLoader(root, handler.events, this.loadEventModule.bind(this));
+      flatLoader(
+        root,
+        handler.events,
+        this.loadEventModule.bind(this)
+      );
     }
   }
 
@@ -173,7 +204,10 @@ export class DiscoraClient extends Client {
         }
       );
 
-      devLog(this, `Successfully reloaded ${data?.length} application dev (/) commands.`);
+      devLog(
+        this,
+        `Successfully reloaded ${data?.length} application dev (/) commands.`
+      );
     } catch (error) {
       console.error(error);
     }
@@ -184,11 +218,17 @@ export class DiscoraClient extends Client {
 
       const rest = new REST().setToken(this.config.token);
 
-      const data: any = await rest.put(Routes.applicationCommands(clientId), {
-        body: this.slashCommandsInJson,
-      });
+      const data: any = await rest.put(
+        Routes.applicationCommands(clientId),
+        {
+          body: this.slashCommandsInJson,
+        }
+      );
 
-      devLog(this, `Successfully reloaded ${data?.length} application (/) commands.`);
+      devLog(
+        this,
+        `Successfully reloaded ${data?.length} application (/) commands.`
+      );
     } catch (error) {
       console.error(error);
     }
@@ -203,7 +243,9 @@ export class DiscoraClient extends Client {
 
     if (environment === "development") {
       if (!guildId) {
-        throw new Error("GuildId is required to register guild commands in development.");
+        throw new Error(
+          "GuildId is required to register guild commands in development."
+        );
       }
       return await this.registerGuildCommands();
     }
@@ -230,7 +272,10 @@ export class DiscoraClient extends Client {
     const command = this.slashCommands.get(commandName);
 
     if (!command || !command.handlers) {
-      devLog(this, `No command or handlers found for button: ${commandName}`);
+      devLog(
+        this,
+        `No command or handlers found for button: ${commandName}`
+      );
       return;
     }
     const handler = command.handlers["handleButtonClick"];
@@ -238,7 +283,10 @@ export class DiscoraClient extends Client {
     if (handler && typeof handler === "function") {
       await handler(interaction); // Call the handler
     } else {
-      devLog(this, `[handler] handleButton not found for command: ${commandName}`);
+      devLog(
+        this,
+        `[handler] handleButton not found for command: ${commandName}`
+      );
     }
   }
 
@@ -288,6 +336,18 @@ export class DiscoraClient extends Client {
         this,
         `[ModalSubmit] handleModalSubmit not found for command: ${commandName}`
       );
+    }
+  }
+
+  async handleCommand(interaction: Interaction) {
+    if (interaction.isChatInputCommand()) {
+      await this.handleChatInput(interaction);
+    } else if (interaction.isButton()) {
+      await this.handleButton(interaction);
+    } else if (interaction.isAutocomplete()) {
+      await this.handleAutoComplete(interaction);
+    } else if (interaction.isModalSubmit()) {
+      await this.handleModal(interaction);
     }
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "discora",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Discora is a structured framework for building Discord bots using Discord.js. It enhances readability and simplifies command handling, event management, and customizable interactions.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
