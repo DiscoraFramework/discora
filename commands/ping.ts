@@ -1,5 +1,4 @@
 /** @format */
-
 import {
   SlashCommandBuilder,
   ActionRowBuilder,
@@ -8,11 +7,12 @@ import {
   ButtonInteraction,
   ChatInputCommandInteraction,
   AutocompleteInteraction,
+  Interaction,
 } from "discord.js";
 
-import { createSlashCommand } from "../lib";
+import { createSlashCommand, HandleButtonClickFunction } from "../lib";
 
-export const handleButtonClick = async (interaction: ButtonInteraction) => {
+export const handleButtonClick: HandleButtonClickFunction = async (interaction) => {
   if (interaction.customId === "ping-hello_button") {
     return await interaction.reply("hello world");
   }
