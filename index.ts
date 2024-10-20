@@ -4,6 +4,8 @@ import { GatewayIntentBits } from "discord.js";
 import { DiscoraClient } from "./lib/client";
 import dotenv from "dotenv";
 
+
+
 dotenv.config();
 
 const client = new DiscoraClient({

@@ -1,12 +1,37 @@
 {
   "name": "discora",
-  "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "Discora is a structured framework for building Discord bots using Discord.js. It enhances readability and simplifies command handling, event management, and customizable interactions.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "build": "tsup"
   },
-  "keywords": [],
+  "keywords": [
+    "discora",
+    "discord",
+    "discord.js",
+    "discord bot framework",
+    "command handling",
+    "event management",
+    "slash commands",
+    "button interactions",
+    "autocomplete",
+    "modal handling",
+    "discord bot development",
+    "open-source",
+    "bot commands",
+    "discord API",
+    "node.js",
+    "typescript",
+    "custom interactions",
+    "user experience",
+    "community-driven",
+    "developer tools",
+    "framework for Discord bots"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -15,6 +40,16 @@
   "devDependencies": {
     "dotenv": "^16.4.5",
     "nodemon": "^3.1.7",
-    "tsx": "^4.19.1"
-  }
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DiscoraLabs/discora.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DiscoraLabs/discora/issues"
+  },
+  "homepage": "https://github.com/DiscoraLabs/discora#readme"
 }
