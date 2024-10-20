@@ -38,7 +38,3 @@ npx create-discora@latest
 
 For support, visit the documention or join our Discord server.
 
-
-## Authors
-
-- [@itsZavier(imani Brown)](https://github.com/Itszavier)
