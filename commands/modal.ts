@@ -8,11 +8,14 @@ import {
   TextInputStyle,
   ModalSubmitInteraction,
 } from "discord.js";
+
+
 import { createSlashCommand } from "../lib";
 
 // Modal handler
-export const modalSubmitHandler = async (interaction: ModalSubmitInteraction) => {
+export const handleModalSubmit = async (interaction: ModalSubmitInteraction) => {
   // Retrieve the text input value from the modal
+  
   const textInputValue = interaction.fields.getTextInputValue("test-input");
 
   console.log("Text input received:", textInputValue);
@@ -24,6 +27,8 @@ export const modalSubmitHandler = async (interaction: ModalSubmitInteraction) =>
     await interaction.reply("Submission is empty or missing.");
   }
 };
+
+
 
 // Command to show the modal
 export default createSlashCommand({

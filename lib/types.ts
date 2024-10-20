@@ -12,7 +12,9 @@ export interface ISlashCommand {
   data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
   execute: (interaction: ChatInputCommandInteraction) => any;
   handlers?: {
-    [key: string]: (interaction: any) => any; // Handlers can be of any interaction type
+    handleButtonClick?: (...args: any) => any;
+    handleAutoComplete?: (...args: any) => any;
+    handleModalSubmit?: (...args: any) => any; // Handlers can be of any interaction type
   };
 }
 

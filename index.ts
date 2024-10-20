@@ -15,9 +15,15 @@ const client = new DiscoraClient({
     slash: "/commands",
     events: "/events",
   },
+  loader: {
+    events: "flat",
+    slash: "recursive",
+  },
   client: {
     intents: [GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent],
   },
 });
 
 client.start();
+
+console.log(client.slashCommands);

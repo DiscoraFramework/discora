@@ -12,8 +12,7 @@ import {
 
 import { createSlashCommand } from "../lib";
 
-
-export const buttonHandler = async (interaction: ButtonInteraction) => {
+export const handleButtonClick = async (interaction: ButtonInteraction) => {
   if (interaction.customId === "ping-hello_button") {
     return await interaction.reply("hello world");
   }
@@ -22,10 +21,6 @@ export const buttonHandler = async (interaction: ButtonInteraction) => {
     return await interaction.reply("hi");
   }
 };
-
-
-
-
 
 //etc
 export default createSlashCommand({

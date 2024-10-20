@@ -7,6 +7,7 @@ import {
   Client,
   ClientOptions,
   Collection,
+  ModalSubmitInteraction,
   REST,
   Routes,
 } from "discord.js";
@@ -50,6 +51,12 @@ function _defaults(options: DiscoraClientOptions) {
   return _options;
 }
 
+type HandlerKey = "handleButtonClick" | "handleAutoComplete" | "handleModalSubmit";
+
+function isValidHandlerKey(key: string): key is HandlerKey {
+  return ["handleButtonClick", "handleAutoComplete", "handleModalSubmit"].includes(key);
+}
+
 export class DiscoraClient extends Client {
   slashCommands: Collection<string, ISlashCommand>;
   config: DiscoraClientOptions;
@@ -65,8 +72,7 @@ export class DiscoraClient extends Client {
   async loadSlashCommandsModule(module: any) {
     const command: ISlashCommand = module.default;
 
-    if ("data" in command && "execute" in command) {
-
+    if (command && command.data && command.execute!) {
       command.handlers = command.handlers || {};
 
       this.slashCommandsInJson.push(command.data.toJSON());
@@ -78,22 +84,19 @@ export class DiscoraClient extends Client {
       this.slashCommands.set(command.data.name, command);
 
       const handlers = Object.keys(module).filter(
-        (key) => key.endsWith("Handler") && typeof module[key] === "function"
+        (key) => key.startsWith("handle") && typeof module[key] === "function"
       );
 
       handlers.forEach((handler) => {
-        console.log(`Registered ${handler} for command: ${command.data.name}`);
-
-        // Assign the handler
-        command.handlers![handler] = module[handler]; // Safely assign handler
-
-        // After modification, update the collection with the new handlers
-        this.slashCommands.set(command.data.name, command); // Store updated command back
+        if (isValidHandlerKey(handler)) {
+          const key = handler as HandlerKey;
+          command.handlers![key] = module[handler];
+          // After modification, update the collection with the new handlers
+          this.slashCommands.set(command.data.name, command); // Store updated command back
+        }
       });
-
-      console.log(this.slashCommands);
     } else {
-      devLog(this, "[Loader]: Warning - 'data' or 'execute' missing");
+      devLog(this, `[Loader]: Warning - 'data' or 'execute' missing`);
     }
   }
 
@@ -102,8 +105,10 @@ export class DiscoraClient extends Client {
 
     if (handler?.slash) {
       if (this.isRecursive("slash")) {
-        recursiveLoader(root, handler.slash, this.loadCommands.bind(this));
+        devLog(this, "Using recursive loader");
+        recursiveLoader(root, handler.slash, this.loadSlashCommandsModule.bind(this));
       } else {
+        devLog(this, "Using flat loader");
         flatLoader(root, handler.slash, this.loadSlashCommandsModule.bind(this));
       }
     }
@@ -138,7 +143,7 @@ export class DiscoraClient extends Client {
     }
   }
 
-  private isRecursive(commandType: "slash" |  "events"): boolean {
+  private isRecursive(commandType: "slash" | "events"): boolean {
     const loaderConfig = this.config.loader;
 
     if (!loaderConfig) {
@@ -221,21 +226,19 @@ export class DiscoraClient extends Client {
   }
 
   async handleButton(interaction: ButtonInteraction) {
-    const commandName = interaction.customId.split("-")[0]; // Assuming command name is part of the custom ID
+    const commandName = this.extractCommandName(interaction.customId); // Assuming command name is part of the custom ID
     const command = this.slashCommands.get(commandName);
 
     if (!command || !command.handlers) {
       devLog(this, `No command or handlers found for button: ${commandName}`);
       return;
     }
-
-    const handlerName = interaction.customId.split("-")[1]; // Extract the handler name
-    const handler = command.handlers["buttonHandler"];
+    const handler = command.handlers["handleButtonClick"];
 
     if (handler && typeof handler === "function") {
       await handler(interaction); // Call the handler
     } else {
-      devLog(this, `Handler ${handlerName} not found for command: ${commandName}`);
+      devLog(this, `[handler] handleButton not found for command: ${commandName}`);
     }
   }
 
@@ -247,7 +250,8 @@ export class DiscoraClient extends Client {
     const command = this.slashCommands.get(commandName);
 
     // Check if the command has an autocomplete handler
-    if (!command || !command.handlers?.autoCompleteHandler) {
+
+    if (!command || !command.handlers) {
       devLog(
         this,
         `[AutoComplete]: No autocomplete handler found for command: ${commandName}`
@@ -255,16 +259,40 @@ export class DiscoraClient extends Client {
       return;
     }
 
-    try {
-      // Call the autocomplete handler defined in the command file
-      await command.handlers.autoCompleteHandler(interaction);
-    } catch (error) {
+    const handler = command.handlers["handleAutoComplete"];
+
+    if (handler && typeof handler === "function") {
+      await handler(interaction); // Call the handler
+    } else {
       devLog(
         this,
-        `[AutoComplete]: Failed to handle autocomplete interaction for ${commandName}`,
-        error
+        `[AutoComplete] handleAutoComplete not found for command: ${commandName}`
       );
     }
+  }
+
+  async handleModal(interaction: ModalSubmitInteraction) {
+    const commandName = this.extractCommandName(interaction.customId);
+    const command = this.slashCommands.get(commandName);
+
+    if (!command || !command.handlers) {
+      return;
+    }
+
+    const handler = command.handlers["handleModalSubmit"];
+
+    if (handler && typeof handler === "function") {
+      await handler(interaction); // Call the handler
+    } else {
+      devLog(
+        this,
+        `[ModalSubmit] handleModalSubmit not found for command: ${commandName}`
+      );
+    }
+  }
+
+  extractCommandName(customId: string): string {
+    return customId.split("-")[0];
   }
 
   async start() {

@@ -3,7 +3,7 @@
 import { AutocompleteInteraction, ModalSubmitInteraction, SlashCommandBuilder } from "discord.js";
 import { createSlashCommand } from "../lib";
 
-export const autoCompleteHandler = async (interaction: AutocompleteInteraction) => {
+export const handleAutoComplete = async (interaction: AutocompleteInteraction) => {
   const focusedOption = interaction.options.getFocused(true);
 
   console.log(focusedOption);

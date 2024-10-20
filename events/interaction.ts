@@ -11,7 +11,9 @@ export default createEvent({
     } else if (interaction.isButton()) {
       await client.handleButton(interaction);
     } else if (interaction.isAutocomplete()) {
-      await client.handleAutoComplete(interaction)
+      await client.handleAutoComplete(interaction);
+    } else if (interaction.isModalSubmit()) {
+      await client.handleModal(interaction);
     }
   },
 });
