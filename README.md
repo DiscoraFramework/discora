@@ -124,3 +124,69 @@ export default createEvent({
 ```
 
 This setup defines a **ready event** for your bot, which logs a message when your bot goes online. You can customize the `handler` function to include additional functionality.
+
+Here's the updated section with the `handleButtonClick` export example for clarity:
+
+---
+
+## Handlers
+
+There may come a time when you have multiple types of interactions such as **buttons**, **autocomplete**, **modal submissions**, and **context menus** that need to be handled. Managing these interactions in a cluttered way can make your code hard to maintain. Discora provides two ways to handle these interaction events to keep your code clean and organized.
+
+### Example with Exported Handler
+
+You can export your interaction handlers separately to keep your logic clean and maintainable. Here’s an example of exporting the `handleButtonClick` handler while keeping the slash command functionality in the same file:
+
+```ts
+import { SlashCommandBuilder } from "discord.js";
+import { createSlashCommand } from "discora";
+
+// Export button handler separately
+export const handleButtonClick = async (interaction) => {
+  if (interaction.customId === "ping_button") {
+    await interaction.reply("Button clicked after ping!");
+  }
+};
+
+// Slash command with basic execute function
+export default createSlashCommand({
+  data: new SlashCommandBuilder()
+    .setName("ping")
+    .setDescription("Replies with Pong!"),
+
+  execute: async (interaction) => {
+    await interaction.reply({
+      content: "Pong!",
+      components: [
+        {
+          type: 1, // Action row
+          components: [
+            {
+              type: 2, // Button
+              label: "Click me",
+              style: 1,
+              custom_id: "ping_button",
+            },
+          ],
+        },
+      ],
+    });
+  },
+});
+```
+
+In this example:
+
+- **handleButtonClick**: This function is exported and can be handled separately when a button with `customId` `"ping_button"` is clicked.
+- **SlashCommandBuilder**: This defines the slash command `/ping`, which replies with "Pong!" and includes a button interaction.
+
+### Keeping It Organized
+
+By exporting the interaction handler (like `handleButtonClick`), you can easily import this into event files or other modules, making your bot logic cleaner and easier to scale as your bot grows.
+
+
+
+
+
+
+
