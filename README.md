@@ -1,6 +1,5 @@
-# Discora
+# Discora 
 
-## Introduction
 
 Setting up a Discord bot can often feel overwhelming, especially for developers who are new to the platform or looking to optimize their workflow. Here are some common challenges you might face:
 
@@ -16,3 +15,30 @@ Setting up a Discord bot can often feel overwhelming, especially for developers 
 
 Discora aims to alleviate these pain points by providing a streamlined framework that simplifies the setup and management of Discord bots, allowing developers to focus on creating engaging experiences for their users.
 
+Here’s how you can present the installation instructions for Discora in your README:
+
+
+
+## Installation
+
+You can install Discora using npm:
+
+```bash
+npm install discora
+```
+
+Alternatively, you can quickly set up a new project with Discora using npx:
+
+```bash
+npx create-discora@latest
+```
+
+
+## Support
+
+For support, visit the documention or join our Discord server.
+
+
+## Authors
+
+- [@itsZavier(imani Brown)](https://github.com/Itszavier)
