@@ -9,7 +9,7 @@ Interaction handlers are used to manage different interaction events associated 
 Here’s an example of a button handler and a slash command using the `SlashCommandBuilder`:
 
 ```js
-export const buttonHandler = async (interaction) => {
+export const handlebButtonClick = async (interaction) => {
   // Handle a button click here
 };
 
