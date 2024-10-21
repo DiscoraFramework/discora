@@ -1,20 +1,17 @@
 <!-- @format -->
 
-# Discora
 
-Setting up a Discord bot can often feel overwhelming, especially for developers who are new to the platform or looking to optimize their workflow. Here are some common challenges you might face:
+## Discora
 
-1. **Complex Configuration**: Managing multiple components, such as command and event handling, typically requires a lot of repetitive boilerplate code, leading to confusion and errors.
+Building a Discord bot can be tricky, especially for new developers. Here are some common challenges:
 
-2. **Manual Command Registration**: As your bot's functionality grows, manually registering each command can become tedious and prone to mistakes, complicating the overall structure.
+1. ⚙️ **Complex Setup**: Managing commands and events can involve a lot of repetitive code, leading to mistakes.
+2. 🔄 **Unorganized Event Logic**: Event handling can become hard to track, causing the bot to behave unpredictably.
+3. 🧠 **Steep Learning Curve**: Learning how to set up a bot with Node.js and Discord.js can be tough.
+4. 🐞 **Debugging Issues**: Poorly organized code can make fixing problems harder.
 
-3. **Scattered Event Logic**: Event handling logic can become disorganized, making it difficult to track how events are processed and resulting in inconsistent bot behavior.
+Discora, built with **TypeScript** and **type safety** in mind, provides **IntelliSense** support, helping you write better code with fewer errors. The framework keeps everything simple and organized, so you can focus on building great bots.
 
-4. **Steep Learning Curve**: New developers may struggle to learn the setup process, particularly without clear guidance on using Node.js or Discord.js.
-
-5. **Debugging Challenges**: Poor organization of command and event logic can make debugging time-consuming and complicate ongoing maintenance and updates.
-
-Discora aims to alleviate these pain points by providing a streamlined framework that simplifies the setup and management of Discord bots, allowing developers to focus on creating engaging experiences for their users.
 
 ## Installation
 
