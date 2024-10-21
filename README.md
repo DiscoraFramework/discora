@@ -177,7 +177,6 @@ export default createSlashCommand({
 
 ### Key Points:
 
-1. **Custom IDs**: Button custom IDs are prefixed with the command name (`ping-`) to match the handler logic with the command.
+1. **Custom IDs**: Button custom IDs are prefixed with the command name (`ping-`) to ensure the handler logic matches the command.
 2. **Separated Handlers**: The `handleButtonClick` function handles button interactions separately, keeping the code modular and maintainable.
-3. **Usage**: The handler will trigger when buttons with custom IDs like `ping-hello_button` are clicked.
-
+3. **Usage**: The handler triggers for any button with a custom ID prefixed with `ping-`, such as `ping-hello_button`, specifically for that command.
