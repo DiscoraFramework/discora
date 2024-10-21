@@ -30,7 +30,7 @@ npx create-discora@latest
 ## Support
 
 For support, visit the documention or join our Discord server.
-Here’s the updated documentation without the additional handlers:
+
 
 ## Discora Basics
 
