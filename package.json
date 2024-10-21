@@ -1,6 +1,6 @@
 {
   "name": "discora",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Discora is a structured framework for building Discord bots using Discord.js. It enhances readability and simplifies command handling, event management, and customizable interactions.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -33,11 +33,10 @@
     "framework for Discord bots"
   ],
   "author": "Imani Brown",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "dependencies": {
     "discord.js": "^14.16.3"
   },
-
   "devDependencies": {
     "dotenv": "^16.4.5",
     "nodemon": "^3.1.7",
