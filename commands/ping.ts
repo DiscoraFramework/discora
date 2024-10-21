@@ -4,10 +4,6 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ButtonInteraction,
-  ChatInputCommandInteraction,
-  AutocompleteInteraction,
-  Interaction,
 } from "discord.js";
 
 import { createSlashCommand, HandleButtonClickFunction } from "../lib";

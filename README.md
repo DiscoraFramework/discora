@@ -1,5 +1,6 @@
-# Discora 
+<!-- @format -->
 
+# Discora
 
 Setting up a Discord bot can often feel overwhelming, especially for developers who are new to the platform or looking to optimize their workflow. Here are some common challenges you might face:
 
@@ -15,8 +16,6 @@ Setting up a Discord bot can often feel overwhelming, especially for developers 
 
 Discora aims to alleviate these pain points by providing a streamlined framework that simplifies the setup and management of Discord bots, allowing developers to focus on creating engaging experiences for their users.
 
-
-
 ## Installation
 
 You can install Discora using npm:
@@ -31,17 +30,12 @@ Alternatively, you can quickly set up a new project with Discora using npx:
 npx create-discora@latest
 ```
 
-
 ## Support
 
 For support, visit the documention or join our Discord server.
 Here’s the updated documentation without the additional handlers:
 
-
-
-# Discora Basics
-
-### Setup
+## Discora Basics
 
 The `DiscoraClient` extends the Discord.js Client class, handling most of the heavy lifting while still giving you full access to the underlying Client. This allows you to focus on your bot's functionality without worrying about the boilerplate. With `DiscoraClient`, managing commands, events, and other aspects of your bot becomes straightforward.
 
@@ -64,7 +58,7 @@ const client = new DiscoraClient({
 client.start(); // Load commands & events, then start the bot
 ```
 
-### `DiscoraClient` Options
+## `DiscoraClient` Options
 
 - **root**: The project’s root directory, essential for locating your files.
 - **token**: Your Discord bot token for API authentication (required).
@@ -82,9 +76,7 @@ client.start(); // Load commands & events, then start the bot
 - **client**: Configuration options for the Discord.js Client:
   - **intents**: Specifies which events the bot should listen for, such as `"GuildMessages"` and `"GuildMembers"`.
 
-
-
-### Slash Command
+## Slash Command
 
 Here’s how you can create a basic slash command:
 
@@ -106,7 +98,7 @@ export default createSlashCommand({
 - **data**: The command data defined using the `SlashCommandBuilder`. This includes the command name, description, and any options.
 - **execute**: The function executed when a user invokes the slash command. It has access to the interaction object from Discord.js, allowing you to respond to the user.
 
-### Creating an Event
+## Creating an Event
 
 If you used the `create-discora@latest` CLI tool, your `events/ready.ts` file might look like this:
 
@@ -125,68 +117,67 @@ export default createEvent({
 
 This setup defines a **ready event** for your bot, which logs a message when your bot goes online. You can customize the `handler` function to include additional functionality.
 
-Here's the updated section with the `handleButtonClick` export example for clarity:
-
 
 
 ## Handlers
 
-There may come a time when you have multiple types of interactions such as **buttons**, **autocomplete**, **modal submissions**, and **context menus** that need to be handled. Managing these interactions in a cluttered way can make your code hard to maintain. Discora provides two ways to handle these interaction events to keep your code clean and organized.
-
-### Example with Exported Handler
-
-You can export your interaction handlers separately to keep your logic clean and maintainable. Here’s an example of exporting the `handleButtonClick` handler while keeping the slash command functionality in the same file:
+You can export interaction handlers separately to keep your code clean. In this example, button custom IDs are prefixed with the command name to ensure the handler logic matches the command.
 
 ```ts
-import { SlashCommandBuilder } from "discord.js";
-import { createSlashCommand } from "discora";
+import {
+  SlashCommandBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+} from "discord.js";
 
-// Export button handler separately
-export const handleButtonClick = async (interaction) => {
-  if (interaction.customId === "ping_button") {
-    await interaction.reply("Button clicked after ping!");
+import {
+  createSlashCommand,
+  HandleButtonClickFunction,
+} from "../lib";
+
+// Button interaction handler
+export const handleButtonClick: HandleButtonClickFunction = async (
+  interaction
+) => {
+  if (interaction.customId === "ping-hello_button") {
+    await interaction.reply("Hello, world!");
+  } else if (interaction.customId === "ping-hi_button") {
+    await interaction.reply("Hi!");
   }
 };
 
-// Slash command with basic execute function
+// Slash command logic
 export default createSlashCommand({
   data: new SlashCommandBuilder()
     .setName("ping")
-    .setDescription("Replies with Pong!"),
+    .setDescription("A test command"),
 
   execute: async (interaction) => {
+    const helloButton = new ButtonBuilder()
+      .setCustomId("ping-hello_button")
+      .setLabel("Say Hello")
+      .setStyle(ButtonStyle.Primary);
+
+    const hiButton = new ButtonBuilder()
+      .setCustomId("ping-hi_button")
+      .setLabel("Say Hi")
+      .setStyle(ButtonStyle.Primary);
+
+    const row = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(helloButton, hiButton);
+
     await interaction.reply({
-      content: "Pong!",
-      components: [
-        {
-          type: 1, // Action row
-          components: [
-            {
-              type: 2, // Button
-              label: "Click me",
-              style: 1,
-              custom_id: "ping_button",
-            },
-          ],
-        },
-      ],
+      content: "How do you want me to respond?",
+      components: [row],
     });
   },
 });
 ```
 
-In this example:
+### Key Points:
 
-- **handleButtonClick**: This function is exported and can be handled separately when a button with `customId` `"ping_button"` is clicked.
-- **SlashCommandBuilder**: This defines the slash command `/ping`, which replies with "Pong!" and includes a button interaction.
-
-### Keeping It Organized
-
-By exporting the interaction handler (like `handleButtonClick`), you can easily import this into event files or other modules, making your bot logic cleaner and easier to scale as your bot grows.
-
-
-
-
-
-
+1. **Custom IDs**: Button custom IDs are prefixed with the command name (`ping-`) to match the handler logic with the command.
+2. **Separated Handlers**: The `handleButtonClick` function handles button interactions separately, keeping the code modular and maintainable.
+3. **Usage**: The handler will trigger when buttons with custom IDs like `ping-hello_button` are clicked.
 
