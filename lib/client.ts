@@ -78,7 +78,7 @@ export class DiscoraClient extends Client {
   }
 
   async loadSlashCommandsModule(module: any) {
-    const command: ISlashCommand = module.default;
+    const command: ISlashCommand = module?.default || module;
 
     if (command && command.data && command.execute!) {
       command.handlers = command.handlers || {};
@@ -133,7 +133,7 @@ export class DiscoraClient extends Client {
   }
 
   private loadEventModule(module: any) {
-    const event = module.default;
+    const event = module?.default || module;
 
     if (!event) {
       devLog(
